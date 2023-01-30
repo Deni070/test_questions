@@ -1,0 +1,92 @@
+#gallery {
+    padding-top: 122px;
+}
+.d-none{
+    display: none;
+}
+.fix-header {
+    position: fixed;
+    z-index: 99;
+    width: 100%;
+    background: #cdffee;
+    padding: 30px;
+    margin: -10px;
+    overflow: hidden;
+}
+
+.fix-header fieldset, .fix-header h1{
+    display: inline-flex;
+    margin: 0px 30px;
+}
+
+.cards {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+.card {
+    display: none;
+    position: relative;
+    background-color: aquamarine;
+    width: 300px;
+    margin: 20px;
+}
+.card p{
+    padding: 10px  10px;
+
+}
+.card_img{
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    overflow: hidden;
+
+}
+.card_icon_close{
+    position: absolute;
+    width: 10%;
+    z-index: 0;
+    right: 0;
+    margin-right: 5px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background-color: white;
+    cursor: pointer;
+}
+  
+.card.is-visible {
+    display: block;
+    animation: fadeInFromNone 0.5s ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+.card.is-hidden {
+    animation: fadeOutFromBlock 0.5s ease-in-out;
+}
+.page_list li {
+    display: inline;
+    cursor: pointer;
+    padding: 3px;
+}
+@keyframes fadeInFromNone {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOutFromBlock {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}

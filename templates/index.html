@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <title>Elecard</title>
+</head>
+<body>
+    <div class="fix-header">
+        <h1>Elecard</h1>
+        <button onclick="get_all_card();">Все карточки</button>
+        <fieldset>
+            <legend>Сортировать по:</legend>
+            <div>
+              <input type="radio"  id="radio-category" name="sort-btn" checked data-sort="category">
+              <label for="radio-category">категории</label>
+            </div>
+            <div>
+              <input type="radio" id="radio-timestamp" name="sort-btn" data-sort="timestamp">
+              <label for="radio-timestamp">дате</label>
+            </div>
+            <div>
+              <input type="radio" id="radio-name" name="sort-btn" data-sort="name">
+              <label for="radio-name">названию файла</label>
+            </div>
+            <div>
+              <input type="radio" id="radio-filesize" name="sort-btn" data-sort="filesize">
+              <label for="radio-filesize">размеру файла</label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Выберите вид отображение:</legend>
+            <div>
+              <input type="radio"  id="radio-card-btn" name="views-btn" checked>
+              <label for="radio-card-btn">Карточки</label>
+            </div>
+            <div>
+              <input type="radio" id="radio-list-btn" name="views-btn">
+              <label for="radio-list-btn" onclick="recurse">Древовидный список</label>
+            </div>
+        </fieldset>
+        
+        <button onclick="get_page(page-1);">Предыдущая страница</button>
+        <button onclick="get_page(page+1);">Следующая страница</button>
+        <ul class="page_list"></ul>
+    </div>
+    <div class="cards" id="gallery">
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        let page = 1;
+        let max_page = 0;
+        get_page(page);
+        
+        function get_page(number, count=10){
+            page = number;
+            document.querySelector("#gallery").innerHTML='';
+            $.getJSON('http://contest.elecard.ru/frontend_data/catalog.json', function(data) {
+                if (max_page == 0){
+                    max_page = data.length / count;
+                    console.log(page);
+                    for (let index = 0; index < max_page; index++) {
+                        let ppp = Number(index)+1
+                        jQuery('<li />', {
+                            text: ppp,
+                            onclick:"get_page("+ ppp +");"
+                        }).appendTo('.page_list');
+                    };
+                };
+                for (let index = count*(number-1); index < count*number; index++) {
+                    const value = data[index];
+                    let close_img = jQuery('<img />', {
+                        class: 'card_icon_close',
+                        src: '../static/img/close.png',
+                        onclick: 'get_close_btn(this);'
+                    });
+                    let imgX = jQuery('<img />', {
+                        class: 'card_img',
+                        src: 'http://contest.elecard.ru/frontend_data/' + value.image,
+                    });
+                    let divX = jQuery('<div />', {
+                        class: 'card is-visible',
+                        "data-filesize": value.filesize,
+                        "data-timestamp": value.timestamp,
+                        "data-category": value.category,
+                        "data-name": value.image.split('/')[value.image.split('/').length-1],
+                    })
+                    let pX = jQuery('<p />', {
+                        text: 'Hellooo',
+                    })
+                    divX.append(imgX);
+                    divX.append(close_img);
+                    divX.append(pX);
+                    divX.appendTo('#gallery');
+                }
+                });
+            };
+        
+    </script>
+    
+    <script>
+        function comparator(a, b) {
+            if (a.dataset.index < b.dataset.index)
+                return -1;
+            if (a.dataset.index > b.dataset.index)
+                return 1;
+            return 0;
+        }
+          
+        // Function to sort Data
+        function SortData() {
+            var indexes = document.querySelectorAll("[data-index]");
+            var indexesArray = Array.from(indexes);
+            let sorted = indexesArray.sort(comparator);
+            sorted.forEach(e =>
+                document.querySelector("#list").appendChild(e));
+        }
+    </script>
+    
+  <script>
+    $(function() {
+        $("[data-sort]").click(function () {
+            console.log('Hello');
+            var collator = new Intl.Collator(["en", "ru"], {numeric: true}),
+            rank = this.dataset.sort,
+            order = (this.dataset.order = -(this.dataset.order || -1));
+            comparator = (a, b) => order * collator.compare(
+                            a.dataset[rank],
+                            b.dataset[rank]
+                        ),
+            items = $(".card").sort(comparator);
+            $("#gallery").append(items);
+        });
+    });
+  </script>
+
+    <script>
+
+        // function comparator(a, b) {
+        //     return -1;
+        //     console.log(a.dataset);
+        // };
+          
+        // // Function to sort Data
+        // function sort_card(value) {
+        //     var indexes = document.querySelectorAll("[filesize]");
+        //     var indexesArray = Array.from(indexes);
+        //     let sorted = indexesArray.sort(comparator);
+        //     sorted.forEach(e =>
+        //         document.querySelector("#gallery").appendChild(e));
+        // };
+
+
+
+        function get_all_card() {
+            [...document.querySelectorAll(".card.is-hidden")].map((element) => {
+                element.classList.add("is-visible");
+                element.classList.remove("is-hidden");
+            })
+        };
+
+        function get_close_btn(element) {
+            let el_par = element.parentNode;
+            if (!el_par.classList.contains("is-visible")) {
+                el_par.classList.add("is-visible");
+                el_par.classList.remove("is-hidden");
+            } else {
+                el_par.classList.add("is-hidden");
+                window.setTimeout(function() {
+                el_par.classList.remove("is-visible");
+                }, 500);
+          }
+        };
+    </script>
+    <!-- <script type="text/javascript">
+        function get_radio_list_btn(element){
+            class BinaryTreeNode {
+        constructor(value) {
+            this.left = null;
+            this.right = null;
+            this.parent = parent;
+            this.value = value;
+        }
+
+        get height() {
+            let leftHeight = this.left ? this.left.height + 1 : 0;
+            let rightHeight = this.right ? this.right.height + 1 : 0;
+            return Math.max(leftHeight, rightHeight);
+        }
+        setLeft(node) {
+            if (this.left) {
+            this.left.parent = null;
+            }
+            if (node) {
+            this.left = node;
+            this.left.parent = this;
+            }
+        }
+
+        setRight(node) {
+            if (this.right) {
+            this.right.parent = null;
+            }
+            if (node) {
+            this.right = node;
+            this.right.parent = this;
+            }
+        }
+        }
+        }
+        
+        
+    
+    </script> -->
+</body>
+</html>
